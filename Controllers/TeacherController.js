@@ -6,16 +6,12 @@ const {
 } = require("../Models/Teacher");
 
 /**
- * @desc Add a new teacher
- * @route POST /api/teachers
- * @access Public
+ *
+ *  @desc Add a new Teacher
+ *  @route POST /api/teachers
+ *  @access Public
  */
-const createNewTeacherCtrl = asyncHandler(async (req, res) => {
-  const { error } = validateCreateNewTeacher(req.body);
-  if (error) {
-    return res.status(400).json({ message: error.details[0].message });
-  }
-
+const createNewTeachertCtrl = asyncHandler(async (req, res) => {
   const {
     idNumber,
     firstName,
@@ -23,23 +19,40 @@ const createNewTeacherCtrl = asyncHandler(async (req, res) => {
     lastName,
     birthPlace,
     birthDate,
-    religion,
     nationality,
     gender,
+    grade,
     location,
-    maritalStatus,
-    motherName,
-    childrenCount,
-    contractDate,
-    jobCategory,
-    workStatus,
-    experienceYears,
-    totalSalary,
-    phone,
+    parentPhone,
   } = req.body;
-  const { userId } = req;
-  console.log("User Id ======> ", userId);
 
+  const { userId } = req; // userId من الطلب
+
+  // التحقق من صحة البيانات
+  const { error } = validateCreateNewTeacher(req.body);
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
+  // التحقق من وجود الحقول المطلوبة
+  if (
+    !idNumber ||
+    !firstName ||
+    !middleName ||
+    !lastName ||
+    !birthPlace ||
+    !birthDate ||
+    !nationality ||
+    !gender ||
+    !grade ||
+    !location?.city ||
+    !parentPhone
+  ) {
+    res.status(400);
+    throw new Error("Please fill all required fields.");
+  }
+
+  // إنشاء كائن الطالب الجديد
   const teacher = new Teacher({
     idNumber,
     firstName,
@@ -47,23 +60,20 @@ const createNewTeacherCtrl = asyncHandler(async (req, res) => {
     lastName,
     birthPlace,
     birthDate,
-    religion,
     nationality,
     gender,
-    location,
-    maritalStatus,
-    motherName,
-    childrenCount,
-    contractDate,
-    jobCategory,
-    workStatus,
-    experienceYears,
-    totalSalary,
-    phone,
-    addedBy: userId,
+    grade,
+    location: {
+      city: location.city,
+    },
+    parentPhone,
+    addedBy: userId, // إضافة المستخدم الذي أضاف البيانات
   });
 
+  // حفظ الطالب في قاعدة البيانات
   const savedTeacher = await teacher.save();
+
+  // إرسال استجابة
   res.status(201).json(savedTeacher);
 });
 
@@ -82,22 +92,24 @@ const getAllTeachersCtrl = asyncHandler(async (req, res) => {
  *  @route GET /api/teachers/:id
  *  @access Public
  */
-const getTeacherById = asyncHandler(async (req, res) => {
+const getTeacherByIdCtrl = asyncHandler(async (req, res) => {
   const teacher = await Teacher.findById(req.params.id).populate("userDetails");
-  if (!teacher) return res.status(404).json({ error: "Teacher Not Found" });
+  if (!teacher)
+    return res.status(404).json({ error: "Teacher Is Not Defiend" });
   res.status(200).json(teacher);
 });
 
 /**
  *
- *  @desc Update a teacher
- *  @route PUT /api/teachers/:id
- *  @access Public
+ * @desc Update a teacher
+ * @route PUT /api/teachers/:id
+ * @access Public
  */
-const editTeacherById = asyncHandler(async (req, res) => {
+const editTeacherByIdCtrl = asyncHandler(async (req, res) => {
   const teacher = await Teacher.findById(req.params.id);
 
   const { error } = validateUpdateTeacher(req.body);
+
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
@@ -119,11 +131,11 @@ const editTeacherById = asyncHandler(async (req, res) => {
 });
 
 /**
- *  @desc Delete a teacher
- *  @route DELETE /api/teachers/:id
- *  @access Public
+ * @desc Delete a teacher
+ * @route DELETE /api/teachers/:id
+ * @access Public
  */
-const deleteTeacherById = asyncHandler(async (req, res) => {
+const deleteTeacherByIdCtrl = asyncHandler(async (req, res) => {
   const teacher = await Teacher.findById(req.params.id);
 
   if (!teacher) {
@@ -136,9 +148,9 @@ const deleteTeacherById = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
-  createNewTeacherCtrl,
+  createNewTeachertCtrl,
   getAllTeachersCtrl,
-  getTeacherById,
-  editTeacherById,
-  deleteTeacherById,
+  getTeacherByIdCtrl,
+  editTeacherByIdCtrl,
+  deleteTeacherByIdCtrl,
 };

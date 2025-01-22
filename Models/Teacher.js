@@ -8,24 +8,13 @@ const teacherSchema = new mongoose.Schema({
   lastName: { type: String, required: true },
   birthPlace: { type: String, required: true },
   birthDate: { type: Date, required: true },
-  religion: { type: String, required: true },
   nationality: { type: String, required: true },
   gender: { type: String, required: true },
+  grade: { type: String, required: true },
   location: {
-    city: {
-      type: String,
-      required: true,
-    },
+    city: { type: String, required: true },
   },
-  maritalStatus: { type: String, required: true },
-  motherName: { type: String, required: true },
-  childrenCount: { type: Number, required: true },
-  contractDate: { type: Date, required: true },
-  jobCategory: { type: String, required: true },
-  workStatus: { type: String, required: true },
-  experienceYears: { type: Number, required: true },
-  totalSalary: { type: Number, required: true },
-  phone: { type: String, required: true },
+  parentPhone: { type: String, required: true },
   addedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
@@ -34,14 +23,16 @@ const teacherSchema = new mongoose.Schema({
 });
 
 teacherSchema.virtual("userDetails", {
-  ref: "User", // اسم موديل المستخدم
-  localField: "addedBy", // الحقل المرتبط في المعلم
-  foreignField: "_id", // الحقل المرتبط في المستخدم
-  justOne: true, // لأننا نريد استرجاع مستخدم واحد فقط
+  ref: "User",
+  localField: "addedBy",
+  foreignField: "_id",
+  justOne: true,
 });
 
 teacherSchema.set("toObject", { virtuals: true });
 teacherSchema.set("toJSON", { virtuals: true });
+
+const Teacher = mongoose.model("Teacher", teacherSchema);
 
 function validateCreateNewTeacher(obj) {
   const schema = Joi.object({
@@ -51,21 +42,13 @@ function validateCreateNewTeacher(obj) {
     lastName: Joi.string().required(),
     birthPlace: Joi.string().required(),
     birthDate: Joi.date().required(),
-    religion: Joi.string().required(),
     nationality: Joi.string().required(),
     gender: Joi.string().valid("Male", "Female").required(),
+    grade: Joi.string().required(),
     location: Joi.object({
       city: Joi.string().required(),
     }).required(),
-    maritalStatus: Joi.string().required(),
-    motherName: Joi.string().required(),
-    childrenCount: Joi.number().min(0).required(),
-    contractDate: Joi.date().required(),
-    jobCategory: Joi.string().required(),
-    workStatus: Joi.string().required(),
-    experienceYears: Joi.number().min(0).required(),
-    totalSalary: Joi.number().min(0).required(),
-    phone: Joi.string()
+    parentPhone: Joi.string()
       .pattern(/^[0-9]+$/)
       .required(),
   });
@@ -81,30 +64,20 @@ function validateUpdateTeacher(obj) {
     lastName: Joi.string(),
     birthPlace: Joi.string(),
     birthDate: Joi.date(),
-    religion: Joi.string(),
     nationality: Joi.string(),
     gender: Joi.string().valid("Male", "Female"),
+    grade: Joi.string(),
     location: Joi.object({
       city: Joi.string(),
     }),
-    maritalStatus: Joi.string(),
-    motherName: Joi.string(),
-    childrenCount: Joi.number().min(0),
-    contractDate: Joi.date(),
-    jobCategory: Joi.string(),
-    workStatus: Joi.string(),
-    experienceYears: Joi.number().min(0),
-    totalSalary: Joi.number().min(0),
-    phone: Joi.string().pattern(/^[0-9]+$/),
+    parentPhone: Joi.string().pattern(/^[0-9]+$/),
   }).min(1);
 
   return schema.validate(obj);
 }
 
-const Teacher = mongoose.model("Teacher", teacherSchema);
-
 module.exports = {
   Teacher,
-  validateUpdateTeacher,
   validateCreateNewTeacher,
+  validateUpdateTeacher,
 };

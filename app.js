@@ -1,6 +1,6 @@
 const express = require("express");
-const teacherRoutes = require("./Routes/teacherRoutes");
 const studentRoutes = require("./Routes/studentRoutes");
+const teacherRoutes = require("./Routes/teacherRoutes");
 const authRoute = require("./Routes/authRoutes");
 const protect = require("./Middlewares/protect");
 const exportRoutes = require("./Routes/exportRoutes");
