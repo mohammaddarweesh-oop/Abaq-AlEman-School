@@ -18,6 +18,11 @@ const studentSchema = new mongoose.Schema({
     },
   },
   parentPhone: { type: String, required: true },
+  addedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
 });
 
 const Student = mongoose.model("Student", studentSchema);
@@ -47,7 +52,31 @@ function validateCreateNewStudent(obj) {
   return schema.validate(obj);
 }
 
+function validateUpdateStudent(obj) {
+  const schema = Joi.object({
+    identifier: Joi.string(),
+    firstName: Joi.string(),
+    lastName: Joi.string(),
+    birthDate: Joi.date(),
+    religion: Joi.string(),
+    nationality: Joi.string(),
+    gender: Joi.string().valid("Male", "Female"),
+    location: Joi.object({
+      city: Joi.string(),
+    }),
+    maritalStatus: Joi.string(),
+    phoneNumber: Joi.string().pattern(/^[0-9]+$/),
+    jobCategory: Joi.string(),
+    employmentType: Joi.string().valid("Full-Time", "Part-Time"),
+    yearsOfExperience: Joi.number().integer().min(0),
+    salary: Joi.number().min(0),
+  }).min(1); // على الأقل يجب أن يكون هناك حقل واحد تم تحديثه
+
+  return schema.validate(obj);
+}
+
 module.exports = {
   Student,
   validateCreateNewStudent,
+  validateUpdateStudent,
 };

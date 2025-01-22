@@ -4,7 +4,9 @@ const {
   getStudentByIdCtrl,
   editStudentByIdCtrl,
   deleteStudentByIdCtrl,
-} = require("./Controllers/StudentController");
+} = require("../Controllers/StudentController");
+
+const protect = require("../Middlewares/protect");
 const express = require("express");
 const router = express.Router();
 
@@ -16,6 +18,4 @@ router
   .put(editStudentByIdCtrl)
   .delete(deleteStudentByIdCtrl);
 
-module.exports = {
-  router,
-};
+module.exports = router;

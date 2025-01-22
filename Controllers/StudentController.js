@@ -1,6 +1,9 @@
 const asyncHandler = require("express-async-handler");
 const Student = require("../Models/Student");
-
+const {
+  validateCreateNewStudent,
+  validateUpdateStudent,
+} = require("../Models/Student");
 /**
  *
  *  @desc Add a new student
@@ -10,12 +13,26 @@ const Student = require("../Models/Student");
 const createNewStudentCtrl = asyncHandler(async (req, res) => {
   const { id, name, birthDate, grade, parentContact } = req.body;
 
+  const { error } = validateCreateNewStudent(req.body);
+
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
   if (!id || !name || !birthDate || !grade) {
     res.status(400);
     throw new Error("Please fill all required fields.");
   }
 
-  const student = new Student({ id, name, birthDate, grade, parentContact });
+  const student = new Student({
+    id,
+    name,
+    birthDate,
+    grade,
+    parentContact,
+    addedBy: req.userId, // إضافة المستخدم الذي أضاف البيانات
+  });
+
   const savedStudent = await student.save();
   res.status(201).json(savedStudent);
 });
@@ -50,6 +67,12 @@ const getStudentByIdCtrl = asyncHandler(async (req, res) => {
  */
 const editStudentByIdCtrl = asyncHandler(async (req, res) => {
   const student = await Student.findById(req.params.id);
+
+  const { error } = validateUpdateStudent(req.body);
+
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
 
   if (!student) {
     res.status(404);

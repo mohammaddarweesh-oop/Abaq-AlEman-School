@@ -1,5 +1,9 @@
 const asyncHandler = require("express-async-handler");
-const Teacher = require("../Models/Teacher");
+const {
+  Teacher,
+  validateCreateNewTeacher,
+  validateUpdateTeacher,
+} = require("../Models/Teacher");
 
 /**
  * @desc Add a new teacher
@@ -7,6 +11,11 @@ const Teacher = require("../Models/Teacher");
  * @access Public
  */
 const createNewTeacherCtrl = asyncHandler(async (req, res) => {
+  const { error } = validateCreateNewTeacher(req.body);
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
   const {
     id,
     name,
@@ -34,6 +43,7 @@ const createNewTeacherCtrl = asyncHandler(async (req, res) => {
     phone,
     salary,
     yearsOfExperience,
+    addedBy: req.userId, // إضافة المستخدم الذي أضاف البيانات
   });
 
   const savedTeacher = await teacher.save();
@@ -69,6 +79,11 @@ const getTeacherById = asyncHandler(async (req, res) => {
  */
 const editTeacherById = asyncHandler(async (req, res) => {
   const teacher = await Teacher.findById(req.params.id);
+
+  const { error } = validateUpdateTeacher(req.body);
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
 
   if (!teacher) {
     res.status(404);

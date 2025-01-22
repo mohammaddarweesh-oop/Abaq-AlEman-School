@@ -1,5 +1,5 @@
 const { mongoose } = require("mongoose");
-const joi = require("joi");
+const Joi = require("joi");
 
 const teacherSchema = new mongoose.Schema({
   idNumber: { type: String, required: true, unique: true },
@@ -26,6 +26,55 @@ const teacherSchema = new mongoose.Schema({
   experienceYears: { type: Number, required: true },
   totalSalary: { type: Number, required: true },
   phone: { type: String, required: true },
+  addedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
 });
 
+function validateUpdateTeacher(obj) {
+  const schema = Joi.object({
+    identifier: Joi.string(),
+    firstName: Joi.string(),
+    lastName: Joi.string(),
+    birthDate: Joi.date(),
+    nationality: Joi.string(),
+    gender: Joi.string().valid("Male", "Female"),
+    address: Joi.string(),
+    phone: Joi.string().pattern(/^[0-9]+$/),
+    salary: Joi.number().min(0),
+    yearsOfExperience: Joi.number().integer().min(0),
+    jobCategory: Joi.string(),
+  }).min(1);
+
+  return schema.validate(obj);
+}
+
+function validateCreateNewTeacher(obj) {
+  const schema = Joi.object({
+    identifier: Joi.string().required(),
+    firstName: Joi.string().required(),
+    lastName: Joi.string().required(),
+    birthDate: Joi.date().required(),
+    nationality: Joi.string().required(),
+    gender: Joi.string().valid("Male", "Female").required(),
+    address: Joi.string().required(),
+    phone: Joi.string()
+      .pattern(/^[0-9]+$/)
+      .required(),
+    salary: Joi.number().min(0).required(),
+    yearsOfExperience: Joi.number().integer().min(0).required(),
+    jobCategory: Joi.string().required(),
+  });
+
+  return schema.validate(obj);
+}
+
 const Teacher = mongoose.model("Teacher", teacherSchema);
+
+module.exports = {
+  Teacher,
+  validateUpdateTeacher,
+  validateCreateNewTeacher,
+};

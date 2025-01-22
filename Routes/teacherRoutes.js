@@ -6,7 +6,8 @@ const {
   getTeacherById,
   deleteTeacherById,
   editTeacherById,
-} = require("./Controllers/TeacherController");
+} = require("../Controllers/TeacherController");
+const protect = require("../Middlewares/protect");
 
 router.route("/teachers").post(createNewTeacherCtrl).get(getAllTeachersCtrl);
 
@@ -16,6 +17,4 @@ router
   .put(editTeacherById)
   .delete(deleteTeacherById);
 
-module.exports = {
-  router,
-};
+module.exports = router;
