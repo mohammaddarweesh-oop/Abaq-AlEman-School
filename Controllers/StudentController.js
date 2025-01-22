@@ -1,9 +1,10 @@
 const asyncHandler = require("express-async-handler");
-const Student = require("../Models/Student");
 const {
   validateCreateNewStudent,
   validateUpdateStudent,
+  Student,
 } = require("../Models/Student");
+
 /**
  *
  *  @desc Add a new student
@@ -11,29 +12,68 @@ const {
  *  @access Public
  */
 const createNewStudentCtrl = asyncHandler(async (req, res) => {
-  const { id, name, birthDate, grade, parentContact } = req.body;
+  const {
+    idNumber,
+    firstName,
+    middleName,
+    lastName,
+    birthPlace,
+    birthDate,
+    nationality,
+    gender,
+    grade,
+    location,
+    parentPhone,
+  } = req.body;
 
+  const { userId } = req; // userId من الطلب
+
+  // التحقق من صحة البيانات
   const { error } = validateCreateNewStudent(req.body);
-
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
 
-  if (!id || !name || !birthDate || !grade) {
+  // التحقق من وجود الحقول المطلوبة
+  if (
+    !idNumber ||
+    !firstName ||
+    !middleName ||
+    !lastName ||
+    !birthPlace ||
+    !birthDate ||
+    !nationality ||
+    !gender ||
+    !grade ||
+    !location?.city ||
+    !parentPhone
+  ) {
     res.status(400);
     throw new Error("Please fill all required fields.");
   }
 
+  // إنشاء كائن الطالب الجديد
   const student = new Student({
-    id,
-    name,
+    idNumber,
+    firstName,
+    middleName,
+    lastName,
+    birthPlace,
     birthDate,
+    nationality,
+    gender,
     grade,
-    parentContact,
-    addedBy: req.userId, // إضافة المستخدم الذي أضاف البيانات
+    location: {
+      city: location.city,
+    },
+    parentPhone,
+    addedBy: userId, // إضافة المستخدم الذي أضاف البيانات
   });
 
+  // حفظ الطالب في قاعدة البيانات
   const savedStudent = await student.save();
+
+  // إرسال استجابة
   res.status(201).json(savedStudent);
 });
 

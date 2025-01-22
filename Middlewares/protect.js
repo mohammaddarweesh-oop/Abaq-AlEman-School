@@ -9,11 +9,9 @@ const protect = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.userId = decoded.userId; // تخزين المعرف في الـ req
+    req.userId = decoded.userId; // تخزين ال id  في ال req
 
     next();
-
-    
   } catch (error) {
     return res.status(401).json({ message: "Not authorized" });
   }

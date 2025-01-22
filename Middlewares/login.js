@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+require("dotenv").config();
 const { Admin } = require("./models/admin");
 
 // تسجيل الدخول
@@ -32,7 +33,7 @@ function authenticate(req, res, next) {
   if (!token) return res.status(401).send("تحتاج إلى تسجيل الدخول");
 
   try {
-    const decoded = jwt.verify(token, "your_jwt_secret");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.admin = decoded; // تخزين بيانات المسؤول في الطلب
     next();
   } catch (err) {

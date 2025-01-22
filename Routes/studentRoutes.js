@@ -6,7 +6,6 @@ const {
   deleteStudentByIdCtrl,
 } = require("../Controllers/StudentController");
 
-const protect = require("../Middlewares/protect");
 const express = require("express");
 const router = express.Router();
 
