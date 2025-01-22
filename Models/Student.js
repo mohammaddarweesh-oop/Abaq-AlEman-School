@@ -12,10 +12,7 @@ const studentSchema = new mongoose.Schema({
   gender: { type: String, required: true },
   grade: { type: String, required: true },
   location: {
-    city: {
-      type: String,
-      required: true,
-    },
+    city: { type: String, required: true },
   },
   parentPhone: { type: String, required: true },
   addedBy: {
@@ -24,6 +21,16 @@ const studentSchema = new mongoose.Schema({
     required: true,
   },
 });
+
+studentSchema.virtual("userDetails", {
+  ref: "User",
+  localField: "addedBy",
+  foreignField: "_id",
+  justOne: true,
+});
+
+studentSchema.set("toObject", { virtuals: true });
+studentSchema.set("toJSON", { virtuals: true });
 
 const Student = mongoose.model("Student", studentSchema);
 

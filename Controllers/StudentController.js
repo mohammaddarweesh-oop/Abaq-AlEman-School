@@ -83,7 +83,7 @@ const createNewStudentCtrl = asyncHandler(async (req, res) => {
  *  @access Public
  */
 const getAllStudentsCtrl = asyncHandler(async (req, res) => {
-  const students = await Student.find();
+  const students = await Student.find().populate("userDetails");
   res.status(200).json(students);
 });
 
@@ -93,7 +93,7 @@ const getAllStudentsCtrl = asyncHandler(async (req, res) => {
  *  @access Public
  */
 const getStudentByIdCtrl = asyncHandler(async (req, res) => {
-  const student = await Student.findById(req.params.id);
+  const student = await Student.findById(req.params.id).populate("userDetails");
   if (!student)
     return res.status(404).json({ error: "Student Is Not Defiend" });
   res.status(200).json(student);
@@ -143,7 +143,7 @@ const deleteStudentByIdCtrl = asyncHandler(async (req, res) => {
     throw new Error("Student not found.");
   }
 
-  await student.remove();
+  await Student.findByIdAndDelete(req.params.id);
   res.status(200).json({ message: "Student deleted." });
 });
 

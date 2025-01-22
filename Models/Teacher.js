@@ -33,40 +33,70 @@ const teacherSchema = new mongoose.Schema({
   },
 });
 
-function validateUpdateTeacher(obj) {
+teacherSchema.virtual("userDetails", {
+  ref: "User", // اسم موديل المستخدم
+  localField: "addedBy", // الحقل المرتبط في المعلم
+  foreignField: "_id", // الحقل المرتبط في المستخدم
+  justOne: true, // لأننا نريد استرجاع مستخدم واحد فقط
+});
+
+teacherSchema.set("toObject", { virtuals: true });
+teacherSchema.set("toJSON", { virtuals: true });
+
+function validateCreateNewTeacher(obj) {
   const schema = Joi.object({
-    identifier: Joi.string(),
-    firstName: Joi.string(),
-    lastName: Joi.string(),
-    birthDate: Joi.date(),
-    nationality: Joi.string(),
-    gender: Joi.string().valid("Male", "Female"),
-    address: Joi.string(),
-    phone: Joi.string().pattern(/^[0-9]+$/),
-    salary: Joi.number().min(0),
-    yearsOfExperience: Joi.number().integer().min(0),
-    jobCategory: Joi.string(),
-  }).min(1);
+    idNumber: Joi.string().required(),
+    firstName: Joi.string().required(),
+    middleName: Joi.string().required(),
+    lastName: Joi.string().required(),
+    birthPlace: Joi.string().required(),
+    birthDate: Joi.date().required(),
+    religion: Joi.string().required(),
+    nationality: Joi.string().required(),
+    gender: Joi.string().valid("Male", "Female").required(),
+    location: Joi.object({
+      city: Joi.string().required(),
+    }).required(),
+    maritalStatus: Joi.string().required(),
+    motherName: Joi.string().required(),
+    childrenCount: Joi.number().min(0).required(),
+    contractDate: Joi.date().required(),
+    jobCategory: Joi.string().required(),
+    workStatus: Joi.string().required(),
+    experienceYears: Joi.number().min(0).required(),
+    totalSalary: Joi.number().min(0).required(),
+    phone: Joi.string()
+      .pattern(/^[0-9]+$/)
+      .required(),
+  });
 
   return schema.validate(obj);
 }
 
-function validateCreateNewTeacher(obj) {
+function validateUpdateTeacher(obj) {
   const schema = Joi.object({
-    identifier: Joi.string().required(),
-    firstName: Joi.string().required(),
-    lastName: Joi.string().required(),
-    birthDate: Joi.date().required(),
-    nationality: Joi.string().required(),
-    gender: Joi.string().valid("Male", "Female").required(),
-    address: Joi.string().required(),
-    phone: Joi.string()
-      .pattern(/^[0-9]+$/)
-      .required(),
-    salary: Joi.number().min(0).required(),
-    yearsOfExperience: Joi.number().integer().min(0).required(),
-    jobCategory: Joi.string().required(),
-  });
+    idNumber: Joi.string(),
+    firstName: Joi.string(),
+    middleName: Joi.string(),
+    lastName: Joi.string(),
+    birthPlace: Joi.string(),
+    birthDate: Joi.date(),
+    religion: Joi.string(),
+    nationality: Joi.string(),
+    gender: Joi.string().valid("Male", "Female"),
+    location: Joi.object({
+      city: Joi.string(),
+    }),
+    maritalStatus: Joi.string(),
+    motherName: Joi.string(),
+    childrenCount: Joi.number().min(0),
+    contractDate: Joi.date(),
+    jobCategory: Joi.string(),
+    workStatus: Joi.string(),
+    experienceYears: Joi.number().min(0),
+    totalSalary: Joi.number().min(0),
+    phone: Joi.string().pattern(/^[0-9]+$/),
+  }).min(1);
 
   return schema.validate(obj);
 }

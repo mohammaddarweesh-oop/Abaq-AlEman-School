@@ -17,33 +17,50 @@ const createNewTeacherCtrl = asyncHandler(async (req, res) => {
   }
 
   const {
-    id,
-    name,
+    idNumber,
+    firstName,
+    middleName,
+    lastName,
+    birthPlace,
     birthDate,
+    religion,
     nationality,
     gender,
-    address,
+    location,
+    maritalStatus,
+    motherName,
+    childrenCount,
+    contractDate,
+    jobCategory,
+    workStatus,
+    experienceYears,
+    totalSalary,
     phone,
-    salary,
-    yearsOfExperience,
   } = req.body;
-
-  if (!id || !name || !birthDate) {
-    res.status(400);
-    throw new Error("Please fill all required fields.");
-  }
+  const { userId } = req;
+  console.log("User Id ======> ", userId);
 
   const teacher = new Teacher({
-    id,
-    name,
+    idNumber,
+    firstName,
+    middleName,
+    lastName,
+    birthPlace,
     birthDate,
+    religion,
     nationality,
     gender,
-    address,
+    location,
+    maritalStatus,
+    motherName,
+    childrenCount,
+    contractDate,
+    jobCategory,
+    workStatus,
+    experienceYears,
+    totalSalary,
     phone,
-    salary,
-    yearsOfExperience,
-    addedBy: req.userId, // إضافة المستخدم الذي أضاف البيانات
+    addedBy: userId,
   });
 
   const savedTeacher = await teacher.save();
@@ -56,7 +73,7 @@ const createNewTeacherCtrl = asyncHandler(async (req, res) => {
  *  @access Public
  */
 const getAllTeachersCtrl = asyncHandler(async (req, res) => {
-  const teachers = await Teacher.find();
+  const teachers = await Teacher.find().populate("userDetails");
   res.status(200).json(teachers);
 });
 
@@ -66,7 +83,7 @@ const getAllTeachersCtrl = asyncHandler(async (req, res) => {
  *  @access Public
  */
 const getTeacherById = asyncHandler(async (req, res) => {
-  const teacher = await Teacher.findById(req.params.id);
+  const teacher = await Teacher.findById(req.params.id).populate("userDetails");
   if (!teacher) return res.status(404).json({ error: "Teacher Not Found" });
   res.status(200).json(teacher);
 });
@@ -114,7 +131,7 @@ const deleteTeacherById = asyncHandler(async (req, res) => {
     throw new Error("Teacher not found.");
   }
 
-  await teacher.remove();
+  await Teacher.findByIdAndDelete(req.params.id);
   res.status(200).json({ message: "Teacher deleted." });
 });
 
