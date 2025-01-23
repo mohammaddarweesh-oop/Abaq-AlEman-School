@@ -16,9 +16,12 @@ const PORT = process.env.PORT || 3003;
 app.use(express.json());
 app.use(helmet());
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: [
+    "http://localhost:3000",  
+    "https://abaq-aleman-school.onrender.com"  
+  ],
   methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true, 
+  credentials: true,
 }));
 
 app.use("/api", authRoute);
