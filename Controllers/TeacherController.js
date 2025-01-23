@@ -26,15 +26,13 @@ const createNewTeachertCtrl = asyncHandler(async (req, res) => {
     parentPhone,
   } = req.body;
 
-  const { userId } = req; // userId من الطلب
+  const { userId } = req;
 
-  // التحقق من صحة البيانات
   const { error } = validateCreateNewTeacher(req.body);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
 
-  // التحقق من وجود الحقول المطلوبة
   if (
     !idNumber ||
     !firstName ||
@@ -52,7 +50,6 @@ const createNewTeachertCtrl = asyncHandler(async (req, res) => {
     throw new Error("Please fill all required fields.");
   }
 
-  // إنشاء كائن الطالب الجديد
   const teacher = new Teacher({
     idNumber,
     firstName,
@@ -67,13 +64,11 @@ const createNewTeachertCtrl = asyncHandler(async (req, res) => {
       city: location.city,
     },
     parentPhone,
-    addedBy: userId, // إضافة المستخدم الذي أضاف البيانات
+    addedBy: userId,
   });
 
-  // حفظ الطالب في قاعدة البيانات
   const savedTeacher = await teacher.save();
 
-  // إرسال استجابة
   res.status(201).json(savedTeacher);
 });
 

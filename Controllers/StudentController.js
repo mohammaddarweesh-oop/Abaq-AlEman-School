@@ -38,7 +38,6 @@ const createNewStudentCtrl = asyncHandler(async (req, res) => {
     phone,
   } = req.body;
   const { userId } = req;
-  console.log("User Id ======> ", userId);
 
   const student = new Student({
     idNumber,
